@@ -1,8 +1,12 @@
+from configparser import ConfigParser
 import requests
 import json
 from datetime import datetime, timezone
 
-API_KEY = "a210ef53e8cfbac54bf57636f90aa41e"
+
+config = ConfigParser()
+config.read('config.ini')
+API_KEY = GEOCODING_API_KEY = config.get('auth', 'API_KEY')
 
 
 def print_weather(city_name):
