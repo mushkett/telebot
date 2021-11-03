@@ -6,6 +6,7 @@ config = ConfigParser()
 config.read('config.ini')
 GEOCODING_API_KEY = config.get('auth', 'GEOCODING_API_KEY')
 
+
 def get_city_latitude(country, state, city):
     req = requests.get(f"https://graphhopper.com/api/1/geocode?q={city}&locale=en&debug=true&key={GEOCODING_API_KEY}") \
         .text
