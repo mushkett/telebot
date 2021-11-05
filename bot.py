@@ -15,6 +15,7 @@ TOKEN = config.get('auth', 'TOKEN')
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
+
 @dp.message_handler(commands=['start', 'help'])
 async def commands_start(message: types.Message):
     await message.reply('Привет! Я погодный бот')

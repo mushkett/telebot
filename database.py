@@ -23,10 +23,16 @@ class User(Base):
 
     user_id = Column(Integer, primary_key=True)
     chat_id = Column(Integer)
-    user_city = Column(String)
-    city_latitude = Column(Float)
-    city_longitude = Column(Float)
+    fk_location_id = Column(Integer)
 
+
+class Location(Base):
+    __tablename__ = 'locations'
+
+    location_id = Column(Integer, primary_key=True)
+    city = Column(String)
+    latitude = Column(Float)
+    longitude = Column(Float)
 
 
 Base.metadata.create_all(engine)
@@ -37,6 +43,26 @@ Session = sessionmaker(bind=engine)
 def set_location(chat_id, country, state, city):
     coord = geocoding_API.get_city_latitude(country, state, city)
     session = Session()
-    user = User(user_city=city, city_latitude=coord['lat'], city_longitude=coord['lng'], chat_id=chat_id)
-    session.add(user)
+
+    if session.query(Location).filter(Location.latitude == coord['lat'], Location.longitude == coord['lng']).first() is\
+            None:
+        location = Location(city=city, latitude=coord['lat'], longitude=coord['lng'])
+        session.add(location)
+        session.commit()
+
+    fk_location_id = session.query(Location).filter(Location.latitude == coord['lat'],
+                                                    Location.longitude == coord['lng']).first()
+    fk_location_id = fk_location_id.location_id
+
+
+    if session.query(User).filter(User.chat_id == chat_id).first() is None:
+        user = User(chat_id=chat_id, fk_location_id=fk_location_id)
+        session.add(user)
+    else:
+        a = session.query(User).filter(User.chat_id == chat_id).first()
+        a.fk_location_id = fk_location_id
+
     session.commit()
+
+
+
