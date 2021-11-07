@@ -39,8 +39,8 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
 
-def set_location(chat_id, country, state, city):
-    coord = geocoding_API.get_city_latitude(country, state, city)
+def set_location(chat_id, state, city):
+    coord = geocoding_API.get_city_latitude(state, city)
     session = Session()
 
     if session.query(Location).filter(Location.latitude == coord['lat'],
@@ -72,5 +72,3 @@ def get_location(chat_id):
         location = session.query(Location).filter(Location.location_id == fk_location_id).first()
         coord = {'lat': location.latitude, 'lng': location.longitude}
         return coord
-
-
