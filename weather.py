@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from configparser import ConfigParser
-from pprint import pprint
+
 
 import requests
 import json
@@ -26,12 +26,14 @@ def weather_1_day(chat_id):
     summary_weather = f"{datetime.utcfromtimestamp(day['dt']).strftime('%d.%m.%Y')} \n" \
                       f"Temperature: {day['temp']['min']} - {day['temp']['max']} \n" \
                       f"Weather: {day['weather'][0]['description']} \n" \
+                      f"Humidity: {day['humidity']}%\n" \
                       f"Sunrise:" \
                       f" {(datetime.utcfromtimestamp(day['sunrise']) + timedelta(hours=2)).strftime('%H:%m')} \n" \
                       f"Sunset: " \
                       f"{(datetime.utcfromtimestamp(day['sunset']) + timedelta(hours=2)).strftime('%H:%m')}"
 
     return summary_weather
+
 
 def weather_several_days(chat_id, days):
     coord = database.get_location(chat_id)
@@ -46,9 +48,8 @@ def weather_several_days(chat_id, days):
     for i in range(0, days):
         day = json_dict['daily'][i]
         summary_weather += f"{datetime.utcfromtimestamp(day['dt']).strftime('%d.%m.%Y')} \n" \
-                           f"Temperature: {day['temp']['min']} - {day['temp']['max']} \n" \
+                           f"Temperature: {day['temp']['min']}  -  {day['temp']['max']} \n" \
                            f"Weather: {day['weather'][0]['description']} \n" \
+                           f"Humidity: {day['humidity']}%\n" \
                            f"\n"
     return summary_weather
-
-
