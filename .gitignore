@@ -3,4 +3,5 @@ bot_run.bat
 
 .idea/
 __pycache__/
+config.ini
 # created by virtualenv automatically
