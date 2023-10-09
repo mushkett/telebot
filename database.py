@@ -4,8 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 import geocoding_API
 
-engine = create_engine('postgresql+psycopg2://qplogdvyiaaymv:e3b6b3ce79fccbfeb8e7c5f716ae4f19da165e9a9441c3d0d649c1c3c'
-                       'af0fdf0@ec2-52-19-164-214.eu-west-1.compute.amazonaws.com/d8mmdsqobd7qjg')
+engine = create_engine('postgresql+psycopg2://postgres:12345@localhost:5432/postgres')
 connection = engine.connect()
 
 # def set_location(chat_id, country, state, city):
@@ -39,12 +38,12 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
 
-def set_location(chat_id, state, city):
-    coord = geocoding_API.get_city_latitude(state, city)
+def set_location(chat_id, country, city):
+    coord = geocoding_API.get_city_latitude(country, city)
     session = Session()
 
-    if session.query(Location).filter(Location.latitude == coord['lat'],
-                                      Location.longitude == coord['lng']).first() is None:
+    if (session.query(Location).filter(Location.latitude == coord['lat'], Location.longitude == coord['lng'])
+            .first() is None):
         location = Location(city=city, latitude=coord['lat'], longitude=coord['lng'])
         session.add(location)
         session.commit()

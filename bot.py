@@ -36,30 +36,27 @@ async def enter_location_config(message: types.Message):
 
 @dp.message_handler(state=location_states.input_city)
 async def input_city(message: types.Message, state: FSMContext):
-    answer1 = message.text  # city name
-    dict1 = geocoding_API.get_city_list(answer1)
-    my_string = 'Choose your state (number only):\n'
-    for i in dict1:
-        my_string += f'{i}.{dict1[i]}\n'
-    await message.answer(my_string)
-    await state.update_data(city=answer1)
-    await state.update_data(dict=dict1)
+    city_name = message.text  # city name
+    locations_dict = geocoding_API.get_city_list(city_name)
+    location_list_answer = 'Choose your county (number only):\n'
+    for i in locations_dict:
+        location_list_answer += f'{i}.{locations_dict[i]}\n'
+    await message.answer(location_list_answer)
+    await state.update_data(city=city_name)
+    await state.update_data(dict=locations_dict)
     await location_states.choose_city.set()
 
 
 @dp.message_handler(state=location_states.choose_city)
 async def choose_city(message: types.Message, state: FSMContext):
-    try:
-        answer2 = message.text
-        data = await state.get_data()
-        dict1 = data.get('dict')
-        if set_location(message.chat.id, dict1[int(answer2)], data.get('city')) != 0:
-            set_location(message.chat.id, dict1[int(answer2)], data.get('city'))
-            await message.answer('Thank you! Now you can get weather forecast', reply_markup=mainMenu)
-    except:
-        await message.answer(f'Error, make sure the request is entered correctly and in English')
-    finally:
-        await state.finish()
+    location_number = message.text
+    data = await state.get_data()
+    dict1 = data.get('dict')
+    if set_location(chat_id=message.chat.id, country=dict1[int(location_number)], city=data.get('city')) != 0:
+        set_location(chat_id=message.chat.id, country=dict1[int(location_number)], city=data.get('city'))
+        await message.answer('Thank you! Now you can get weather forecast', reply_markup=mainMenu)
+
+    await state.finish()
 
 
 @dp.message_handler(commands=['menu'])
@@ -82,7 +79,7 @@ async def get_3_days_weather(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text='get_5_days_weather')
-async def get_3_days_weather(call: CallbackQuery):
+async def get_5_days_weather(call: CallbackQuery):
     await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)
     await call.message.answer(text=f'{weather.weather_several_days(call.from_user.id, 5)}')
     await call.message.answer(text='Forecast for', reply_markup=mainMenu)
